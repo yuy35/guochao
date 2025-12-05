@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Chaos: Changxindian Chronicles</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif-sc': ['"Noto Serif SC"', 'serif'],
+                        'mono': ['"Courier Prime"', 'Courier New', 'monospace']
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'fade-in': 'fade-in 0.3s ease-out forwards',
+                        'shake-x': 'shake-x 0.4s cubic-bezier(.36,.07,.19,.97) both',
+                        'shake-y': 'shake-y 0.4s cubic-bezier(.36,.07,.19,.97) both',
+                        'pop': 'pop 0.2s ease-out',
+                        'lunge': 'lunge 0.15s ease-out'
+                    },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-10px)' } },
+                        'fade-in': { from: { opacity: '0', transform: 'translateY(10px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+                        'shake-x': { '0%, 100%': { transform: 'translateX(0)' }, '25%': { transform: 'translateX(-8px) rotate(-5deg)' }, '75%': { transform: 'translateX(8px) rotate(5deg)' } },
+                        'shake-y': { '0%, 100%': { transform: 'translateY(0)' }, '25%': { transform: 'translateY(-8px)' }, '75%': { transform: 'translateY(8px)' } },
+                        pop: { '0%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.1)' }, '100%': { transform: 'scale(1)' } },
+                        lunge: { '0%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-12px)' }, '100%': { transform: 'translateY(0)' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            background-color: #111827;
+            color: #e5e7eb;
+            background-image: 
+                linear-gradient(rgba(20, 184, 166, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20, 184, 166, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "@heroicons/react/": "https://aistudiocdn.com/@heroicons/react@^2.2.0/",
+    "vite": "https://aistudiocdn.com/vite@^7.2.6",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        // import { GoogleGenAI } from "https://esm.run/@google/genai";
+
+        // ==========================================
+        // 【在此处填入你的 API KEY】
+        // 填写示例: const YOUR_GOOGLE_API_KEY = "AIzaSyDxxxx...";
+        // const YOUR_GOOGLE_API_KEY = "gen-lang-client-0714257028"; 
+        // ==========================================
+
+        // --- ICONS (SVG Components) ---
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            }
+        const Icons = {
+            Heart: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" /></svg>,
+            Sparkles: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813a3.75 3.75 0 002.576-2.576l.813-2.846A.75.75 0 019 4.5zM6.97 15.03a.75.75 0 011.06 0l1.97 1.97 1.97-1.97a.75.75 0 111.06 1.06l-1.97 1.97 1.97 1.97a.75.75 0 11-1.06 1.06l-1.97-1.97-1.97 1.97a.75.75 0 11-1.06-1.06l1.97-1.97-1.97-1.97a.75.75 0 010-1.06zm9.53 3.03a.75.75 0 011.06 0l1.06 1.06 1.06-1.06a.75.75 0 011.06 1.06l-1.06 1.06 1.06 1.06a.75.75 0 01-1.06 1.06l-1.06-1.06-1.06 1.06a.75.75 0 01-1.06-1.06l1.06-1.06-1.06-1.06a.75.75 0 010-1.06z" clipRule="evenodd" /></svg>,
+            ArchiveBox: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375z" /><path fillRule="evenodd" d="M3.087 9l.54 9.176A3 3 0 006.62 21h10.757a3 3 0 002.995-2.824L20.913 9H3.087zm6.163 3.75A.75.75 0 0110 12h4a.75.75 0 010 1.5h-4a.75.75 0 01-.75-.75z" clipRule="evenodd" /></svg>,
+            MagnifyingGlass: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M8.25 10.875a2.625 2.625 0 115.25 0 2.625 2.625 0 01-5.25 0z" /><path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.125 4.5a4.125 4.125 0 102.338 7.524l2.007 2.006a.75.75 0 101.06-1.06l-2.006-2.007a4.125 4.125 0 00-3.399-6.463z" clipRule="evenodd" /></svg>,
+            Fire: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M12.963 2.286a.75.75 0 00-1.071-.136 9.742 9.742 0 00-3.539 6.177 7.547 7.547 0 01-1.705-1.715.75.75 0 00-1.152-.082A9 9 0 1015.68 4.534a7.46 7.46 0 01-2.717-2.248zM15.75 14.25a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clipRule="evenodd" /></svg>,
+            XMark: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" /></svg>,
+            Trash: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.49 1.478l-.56-.09 1.58 11.23a2.75 2.75 0 01-2.75 2.75H5.842a2.75 2.75 0 01-2.75-2.75l1.58-11.23-.56.09a.75.75 0 11-.49-1.478 48.817 48.817 0 013.878-.512v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z" clipRule="evenodd" /></svg>,
+            Play: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" /></svg>,
+            ArrowPath: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0015.059-4.035.75.75 0 00-.53-.918z" clipRule="evenodd" /></svg>,
+            ExclamationTriangle: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" /></svg>,
+            Star: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" /></svg>,
+            CheckCircle: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" /></svg>
+        };
+
+        // --- GLOBAL LOGIC & TYPES ---
+        const GameState = { START: 'START', INTRO: 'INTRO', EXPLORE: 'EXPLORE', COMBAT: 'COMBAT', DIALOGUE: 'DIALOGUE', ENDING: 'ENDING', GAME_OVER: 'GAME_OVER' };
+        const StatType = { HP: 'HP', ATK: 'ATK', DEF: 'DEF', DODGE: 'DODGE', CRIT_RATE: 'CRIT_RATE', CRIT_DMG: 'CRIT_DMG', LUCK: 'LUCK' };
+        
+        const INITIAL_PLAYER = {
+            maxHp: 100, currentHp: 100, atk: 10, def: 5, dodge: 0.05, critRate: 0.1, critDmg: 1.5, luck: 0,
+            exp: 0, level: 1, inventory: [], runesCollected: 0, currentZone: 1, explorationsInCurrentZone: 0,
+            bossLocated: false, truthScore: 0
+        };
+
+        const TRANSLATIONS = {
+            en: {
+                startTitle: "Time Chaos", startDesc: "Roguelike RPG x Intangible Heritage", enterBtn: "Enter the Void", continueBtn: "Continue", playAgain: "Play Again", restart: "Restart", gameOver: "LOST IN TIME", gameOverDesc: "You became a time fragment.", explore: "Explore", attack: "ATTACK", flee: "FLEE", challengeBoss: "CHALLENGE BOSS", bag: "Bag", autoEquip: "Equip All", equip: "Equip", unequip: "Unequip", delete: "Discard", zone: "Zone", level: "LV", levelUp: "Level Up!", foundItem: "Found:", bagFull: "Bag Full! (30/30)", itemDeleted: "Discarded", fled: "You fled!", dodged: "You dodged", hitsYou: "hits you for", damage: "damage", crit: "(CRITICAL!)", hitEnemy: "You hit", bossFound: "BOSS FOUND", exploring: "Exploring...", defeated: "Defeated", recovered: "Recovered", tookDamage: "Took", statUp: "Improved", atk: "ATK", def: "DEF", critStat: "CRIT", critDmg: "CDMG", dodge: "EVA", luck: "LUCK", bonusStats: "Equipped Bonuses", selectItem: "Select item", lootConflict: "Loot Conflict", bagFullDesc: "Bag is full.", discardNew: "Discard New", swapItem: "Swap Item", confirmSwap: "CONFIRM SWAP", cancelSwap: "Cancel Swap", selectHeirloom: "Select Legacy Item", heirloomDesc: "Choose relic to inherit.", restartWithHeirloom: "Reincarnate"
+            ,bossEncounter: "Encountered"},
+            zh: {
+                startTitle: "时空混乱", startDesc: "肉鸽 RPG x 非遗文化", enterBtn: "进入虚空", continueBtn: "继续", playAgain: "再玩一次", restart: "重新开始", gameOver: "迷失时空", gameOverDesc: "你变成了时间的碎片。", explore: "探索", attack: "攻击", flee: "逃跑", challengeBoss: "挑战区域BOSS", bag: "背包", autoEquip: "一键全部装备", equip: "装备", unequip: "卸下", delete: "丢弃", zone: "区域", level: "等级", levelUp: "升级！", foundItem: "获得文物：", bagFull: "背包已满(30/30)！", itemDeleted: "已丢弃", fled: "你逃离了战斗！", dodged: "你躲开了", hitsYou: "击中了你，造成", damage: "伤害", crit: "(暴击!)", hitEnemy: "你击中了", bossFound: "发现BOSS", exploring: "探索中...", defeated: "击败了", recovered: "恢复了", tookDamage: "受到了", statUp: "提升了", atk: "攻击", def: "防御", critStat: "暴击", critDmg: "爆伤", dodge: "闪避", luck: "幸运", bonusStats: "装备加成", selectItem: "点击物品查看详情", lootConflict: "发现宝物", bagFullDesc: "背包已满。", discardNew: "丢弃新物品", swapItem: "替换背包物品", confirmSwap: "确认替换", cancelSwap: "取消替换", selectHeirloom: "选择传承遗物", heirloomDesc: "选择一件非遗来世继承。", restartWithHeirloom: "携带传承重生",bossEncounter: "遭遇了"
+            }
+        };
+
+        // --- EMBEDDED GAME DATA (To avoid fetch/CORS) ---
+        const GAME_DATA = {
+            enemies: {
+                zh: {
+                    low: [{name:"时间残渣",desc:"时间的灰尘聚集而成的低级魔物。"},{name:"历史幽灵",desc:"穿着旧时代衣服的模糊人影。"},{name:"青铜魔偶",desc:"被赋予了诡异生命的古老青铜器。"},{name:"皮影煞",desc:"从幕布中逃出的黑色剪影，锋利无比。"}],
+                    mid: [{name:"发条斥候",desc:"不知疲倦的机械士兵。"},{name:"失控秒针",desc:"锋利且快速移动的金属长条。"},{name:"时光盗贼",desc:"试图偷走你时间的蒙面人。"},{name:"蒸汽梦魇",desc:"喷射着高温蒸汽的扭曲机械。"}],
+                    high: [{name:"虚空水母",desc:"在空气中游动的半透明生物。"},{name:"错乱代码",desc:"仿佛现实世界的BUG，闪烁不定。"},{name:"熵增兽",desc:"一团混乱的黑色物质。"},{name:"因果律者",desc:"能够短暂修改现实的恐怖存在。"}]
+                },
+                en: {
+                    low: [{name:"Time Residue",desc:"Formed from dust."},{name:"History Ghost",desc:"Blurry figure."},{name:"Bronze Golem",desc:"Animated bronze."},{name:"Shadow Puppet",desc:"Sharp silhouette."}],
+                    mid: [{name:"Clockwork Scout",desc:"Ticking soldier."},{name:"Rogue Second Hand",desc:"Sharp metal."},{name:"Time Bandit",desc:"Steals seconds."},{name:"Steam Nightmare",desc:"Venting steam."}],
+                    high: [{name:"Void Jellyfish",desc:"Eats memories."},{name:"Glitch Code",desc:"Reality bug."},{name:"Entropy Beast",desc:"Decays everything."},{name:"Causality Breaker",desc:"Rewrites reality."}]
+                }
+            },
+            items: {
+                zh: [{name:"兔儿爷泥塑",desc:"保佑平安。"},{name:"景泰蓝手镯",desc:"工艺精湛。"},{name:"风筝线轴",desc:"极其坚韧。"},{name:"皮影刻刀",desc:"锋利小刀。"},{name:"京剧脸谱",desc:"千人千面。"},{name:"毛猴",desc:"充满灵性。"},{name:"内画鼻烟壶",desc:"内藏乾坤。"},{name:"中幡",desc:"沉重的大旗。"},{name:"拨浪鼓",desc:"震慑灵魂。"},{name:"剪纸护符",desc:"辟邪力量。"}],
+                en: [{name:"Rabbit God",desc:"Protection."},{name:"Blue Bangle",desc:"Exquisite."},{name:"Kite Spool",desc:"Sharp line."},{name:"Carving Knife",desc:"Sharp tool."},{name:"Opera Mask",desc:"Persona change."},{name:"Hairy Monkey",desc:"Spiritual."},{name:"Snuff Bottle",desc:"Tiny world."},{name:"Heavy Banner",desc:"Strength boost."},{name:"Rattle Drum",desc:"Soul shake."},{name:"Paper Talisman",desc:"Warding power."}]
+            },
+            bossQuotes: {
+                zh: [
+                    {text:"时间... 只是一个... 巨大的谎言...",choiceTruth:"你看见了什么？",choiceIgnorance:"闭嘴吧废物！"},
+                    {text:"机械... 也会生锈... 你的身体... 也一样...",choiceTruth:"锈迹之下是什么？",choiceIgnorance:"我要拆了你！"},
+                    {text:"我看到了... 结局... 一片虚无...",choiceTruth:"结局可以改变吗？",choiceIgnorance:"那你就去死吧！"},
+                    {text:"数据... 溢出... 错误... 严重错误...",choiceTruth:"修复这个世界！",choiceIgnorance:"格式化完成。"},
+                    {text:"因果... 已经断裂... 你回不去的...",choiceTruth:"我会找到路。",choiceIgnorance:"没有什么能阻挡我！"},
+                    {text:"我是... 时间的... 守护者... 还是... 囚徒...",choiceTruth:"我们都是囚徒。",choiceIgnorance:"你是我的垫脚石。"}
+                ],
+                en: [
+                    {text:"Time... is just a lie...",choiceTruth:"What did you see?",choiceIgnorance:"Shut up!"},
+                    {text:"Machines rust...",choiceTruth:"What lies beneath?",choiceIgnorance:"Scrap you!"},
+                    {text:"I saw the end...",choiceTruth:"Can it change?",choiceIgnorance:"Perish!"},
+                    {text:"Data overflow...",choiceTruth:"Fix it!",choiceIgnorance:"Format."},
+                    {text:"Causality broken...",choiceTruth:"I'll find a way.",choiceIgnorance:"Stop me!"},
+                    {text:"Guardian or prisoner...",choiceTruth:"We are prisoners.",choiceIgnorance:"Stepping stone."}
+                ]
+            },
+            events: {
+                zh: {
+                     zone1: [{text:"路边的茶馆空无一人。",choices:[{text:"休息",outcome:"喝了口茶。",hp:30,exp:0,stat:"NONE",val:0,relic:false},{text:"翻找",outcome:"找到钱币。",hp:0,exp:50,stat:"NONE",val:0,relic:false}]},{text:"卖糖葫芦的老人。",choices:[{text:"买一串",outcome:"甜。",hp:20,exp:10,stat:"NONE",val:0,relic:false},{text:"问路",outcome:"指了方向。",hp:0,exp:30,stat:"NONE",val:0,relic:false}]}],
+                     zone2: [{text:"古战场。",choices:[{text:"找兵器",outcome:"找到残片。",hp:0,exp:20,stat:"ATK",val:3,relic:false},{text:"缅怀",outcome:"悲壮。",hp:0,exp:30,stat:"DEF",val:2,relic:false}]}],
+                     zone3: [{text:"蒸汽齿轮轰鸣。",choices:[{text:"捡煤炭",outcome:"找到材料。",hp:0,exp:30,stat:"DEF",val:2,relic:false},{text:"攀爬",outcome:"锻炼。",hp:-5,exp:40,stat:"DODGE",val:0.01,relic:false}]}],
+                     zone4: [{text:"钟摆摇晃。",choices:[{text:"冲过去",outcome:"反应快。",hp:0,exp:30,stat:"DODGE",val:0.03,relic:false},{text:"等待",outcome:"浪费时间。",hp:-10,exp:10,stat:"NONE",val:0,relic:false}]}],
+                     zone5: [{text:"像素世界。",choices:[{text:"攻击",outcome:"找到道具。",hp:0,exp:20,stat:"NONE",val:0,relic:true},{text:"适应",outcome:"生存。",hp:0,exp:40,stat:"DODGE",val:0.03,relic:false}]}],
+                     zone6: [{text:"现实崩塌。",choices:[{text:"倒立",outcome:"适应混乱。",hp:0,exp:50,stat:"DODGE",val:0.05,relic:false},{text:"闭眼",outcome:"忽视。",hp:10,exp:20,stat:"NONE",val:0,relic:false}]}]
+                },
+                en: {
+                     zone1: [{text:"Empty tea house.",choices:[{text:"Rest",outcome:"Drank tea.",hp:30,exp:0,stat:"NONE",val:0,relic:false},{text:"Search",outcome:"Found coins.",hp:0,exp:50,stat:"NONE",val:0,relic:false}]}],
+                     zone2: [{text:"Battlefield.",choices:[{text:"Search",outcome:"Found sword.",hp:0,exp:20,stat:"ATK",val:3,relic:false},{text:"Mourn",outcome:"Sadness.",hp:0,exp:30,stat:"DEF",val:2,relic:false}]}],
+                     zone3: [{text:"Steam gears.",choices:[{text:"Collect",outcome:"Materials.",hp:0,exp:30,stat:"DEF",val:2,relic:false},{text:"Climb",outcome:"Agile.",hp:-5,exp:40,stat:"DODGE",val:0.01,relic:false}]}],
+                     zone4: [{text:"Pendulum.",choices:[{text:"Rush",outcome:"Fast.",hp:0,exp:30,stat:"DODGE",val:0.03,relic:false},{text:"Wait",outcome:"Slow.",hp:-10,exp:10,stat:"NONE",val:0,relic:false}]}],
+                     zone5: [{text:"Pixel world.",choices:[{text:"Attack",outcome:"Item.",hp:0,exp:20,stat:"NONE",val:0,relic:true},{text:"Adapt",outcome:"Dodge.",hp:0,exp:40,stat:"DODGE",val:0.03,relic:false}]}],
+                     zone6: [{text:"Reality collapse.",choices:[{text:"Adapt",outcome:"Chaos.",hp:0,exp:50,stat:"DODGE",val:0.05,relic:false},{text:"Ignore",outcome:"Safe.",hp:10,exp:20,stat:"NONE",val:0,relic:false}]}]
+                }
+            }
+        };
+
+        // --- SERVICE LOGIC ---
+        const GameService = {
+            getZoneBoss: (zone, lang, luck) => {
+                const bosses = GameService.data.bossQuotes[lang].map((_, i) => lang === 'zh' ? ["发条将军", "霓虹王朝皇帝", "虚空学者", "硅基龙神", "量子武僧", "吞噬时间者"][i] : ["Clockwork General", "Neon Dynasty Emperor", "Void Scholar", "Silicon Dragon", "Quantum Monk", "The Time Eater"][i]);
+                const idx = Math.min(Math.max(0, zone - 1), 5);
+                const luckMult = 1 + (luck * 0.1);
+                return {
+                    name: bosses[idx],
+                    description: lang === 'zh' ? `区域 ${zone} 的守护者。` : `Guardian of Zone ${zone}.`,
+                    hp: Math.floor(((zone * 60) + 300) * luckMult),
+                    atk: Math.floor(((zone * 8) + 15) * luckMult)
+                };
+            },
+            getFinalBoss: (player, lang) => {
+                const extraHp = player.inventory.filter(i => i.isEquipped).reduce((acc, i) => acc + (i.stats.HP || 0), 0);
+                const totalMaxHp = player.maxHp + extraHp;
+                const luckMult = 1 + (player.luck * 0.1);
+                return {
+                    name: lang === 'zh' ? "时间熵" : "Time Entropy",
+                    hp: Math.floor((Math.floor(totalMaxHp * 5) + 2000) * luckMult),
+                    maxHp: Math.floor((Math.floor(totalMaxHp * 5) + 2000) * luckMult),
+                    atk: Math.floor((player.def * 2 + 50) * luckMult),
+                    isBoss: true, isFinalBoss: true, dropRate: 1.0
+                };
+            },
+            generateLoot: (level, lang, luck) => {
+                const pool = GameService.data.items[lang];
+                const template = pool[Math.floor(Math.random() * pool.length)];
+                const roll = Math.random() + (luck * 0.01);
+                let rarity = roll > 0.95 ? 'Legendary' : roll > 0.8 ? 'Epic' : roll > 0.5 ? 'Rare' : 'Common';
+                let statCount = rarity === 'Legendary' ? 4 : rarity === 'Epic' ? 3 : rarity === 'Rare' ? 2 : 1;
+                const stats = {};
+                const types = ['ATK', 'DEF', 'HP', 'CRIT_RATE', 'CRIT_DMG', 'DODGE'];
+                for(let i=0; i<statCount; i++) {
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    let val = 0;
+                    const mult = rarity === 'Legendary' ? 1.5 : 1.0;
+                    if(type === 'HP') val = (20 * level + 10) * mult;
+                    if(type === 'ATK') val = (2 * level + 2) * mult;
+                    if(type === 'DEF') val = (1 * level + 1) * mult;
+                    if(type === 'CRIT_RATE' || type === 'DODGE') val = 0.02 * mult;
+                    if(type === 'CRIT_DMG') val = 0.05 * mult;
+                    stats[type] = (stats[type] || 0) + (['CRIT_RATE','DODGE','CRIT_DMG'].includes(type) ? Number(val.toFixed(3)) : Math.floor(val));
+                }
+                return { id: generateUUID(), name: template.name, description: template.desc, rarity, isEquipped: false, stats };
+            },
+            generateScenario: (player, lang) => {
+                const isCombat = Math.random() < 0.4;
+                if(isCombat) {
+                    const poolKey = player.currentZone <= 2 ? 'low' : player.currentZone <= 4 ? 'mid' : 'high';
+                    const pool = GameService.data.enemies[lang][poolKey];
+                    const enemy = pool[Math.floor(Math.random() * pool.length)];
+                    const mult = (0.8 + (player.currentZone - 1) * 0.5) * (1 + player.luck * 0.05);
+                    return {
+                        hasCombat: true, enemyName: enemy.name, enemyDesc: enemy.desc,
+                        enemyHp: Math.floor((player.level * 15 + 20) * mult),
+                        enemyAtk: Math.floor((player.level * 2 + 5) * mult)
+                    };
+                } else {
+                    const zKey = `zone${player.currentZone}`;
+                    // Simple event generation from embedded data
+                    const pool = GameService.data.events[lang][zKey] || GameService.data.events[lang]['zone1'];
+                    const evt = pool[Math.floor(Math.random() * pool.length)];
+                    return { hasCombat: false, description: evt.text, eventChoices: evt.choices.map(c => ({
+                        text: c.text, outcomeDescription: c.outcome, hpChange: c.hp, expChange: c.exp, 
+                        statId: c.stat, statValue: c.val, getRelic: c.relic
+                    }))};
+                }
+            },
+            generateBossDialogue: (zone, lang) => {
+                const q = GameService.data.bossQuotes[lang][Math.min(zone-1, 5)];
+                return { dialogue: q.text, choices: [{ text: q.choiceIgnorance, isTruthful: false }, { text: q.choiceTruth, isTruthful: true }] };
+            },
+            data: GAME_DATA // Attach the embedded data
+        };
+
+        // --- COMPONENTS ---
+        
+        const Layout = ({ children, lang, setLang }) => (
+            <div className="flex flex-col h-screen w-full max-w-md mx-auto bg-gray-900 border-x border-gray-800 shadow-2xl relative">
+                <header className="flex-none p-4 border-b border-gray-800 bg-gray-900/90 backdrop-blur z-10 flex justify-between items-center">
+                    <div>
+                        <h1 className="font-serif-sc text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-purple-500">
+                            {lang === 'en' ? 'Time Chaos' : '时空混乱'}
+                        </h1>
+                    </div>
+                    <button onClick={() => setLang(lang === 'en' ? 'zh' : 'en')} className="px-3 py-1 text-xs border border-gray-600 rounded hover:bg-gray-800 text-teal-400 font-mono">
+                        {lang === 'en' ? '中文' : 'EN'}
+                    </button>
+                </header>
+                <main className="flex-1 overflow-hidden relative flex flex-col">{children}</main>
+            </div>
+        );
+
+        const App = () => {
+            const SAVE_KEY = 'time_chaos_lite_save';
+            
+            // --- LOAD SAVE ---
+            const [saveData] = React.useState(() => {
+                try {
+                    const item = localStorage.getItem(SAVE_KEY);
+                    return item ? JSON.parse(item) : null;
+                } catch { return null; }
+            });
+
+            const [apiKey, setApiKey] = React.useState(saveData?.apiKey || localStorage.getItem('API_KEY') || YOUR_GOOGLE_API_KEY || '');
+            const [lang, setLang] = React.useState(saveData?.lang || 'zh');
+            const [gameState, setGameState] = React.useState(saveData?.gameState || GameState.START);
+            const [player, setPlayer] = React.useState(saveData?.player || INITIAL_PLAYER);
+            const [logs, setLogs] = React.useState(saveData?.logs || []);
+            const [currentEnemy, setCurrentEnemy] = React.useState(saveData?.currentEnemy || null);
+            const [currentChoices, setCurrentChoices] = React.useState(saveData?.currentChoices || []);
+            const [story, setStory] = React.useState(saveData?.story || "");
+            const [ending, setEnding] = React.useState(null);
+            
+            // UI State
+            const [showBag, setShowBag] = React.useState(false);
+            const [selectedId, setSelectedId] = React.useState(null);
+            const [pendingLoot, setPendingLoot] = React.useState(saveData?.pendingLoot || null);
+            const [heirloomId, setHeirloomId] = React.useState(null);
+            const [combatAnim, setCombatAnim] = React.useState('idle');
+            const [loading, setLoading] = React.useState(false);
+
+            const t = TRANSLATIONS[lang];
+            const logsRef = React.useRef(null);
+
+            // --- AUTO SAVE ---
+            React.useEffect(() => {
+                const stateToSave = {
+                    apiKey, lang, gameState, player, logs, currentEnemy, currentChoices, story, pendingLoot
+                };
+                localStorage.setItem(SAVE_KEY, JSON.stringify(stateToSave));
+            }, [apiKey, lang, gameState, player, logs, currentEnemy, currentChoices, story, pendingLoot]);
+
+            React.useEffect(() => {
+                logsRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, [logs]);
+
+            // Save Key
+            const saveKey = (k) => { localStorage.setItem('API_KEY', k); setApiKey(k); };
+
+            const addLog = (text, type = 'info') => setLogs(p => [...p.slice(-49), { id: generateUUID(), text, type }]);
+            
+            // Helper to render color tags from log text
+            const renderLogText = (text) => {
+                const parts = text.split(/(<c:[a-z]+>.*?<\/c>)/g);
+                return parts.map((part, i) => {
+                    const match = part.match(/<c:([a-z]+)>(.*?)<\/c>/);
+                    if (match) {
+                        const color = match[1]; 
+                        const content = match[2];
+                        let className = "text-gray-400";
+                        if (color === 'orange') className = "text-orange-500 font-bold";
+                        if (color === 'blue') className = "text-blue-400 font-bold";
+                        if (color === 'green') className = "text-green-400 font-bold";
+                        if (color === 'gray') className = "text-gray-400 font-bold";
+                        return <span key={i} className={className}>{content}</span>;
+                    }
+                    return part;
+                });
+            };
+
+            const getExtraStat = (inv, stat) => inv.filter(i => i.isEquipped).reduce((a, b) => a + (b.stats[stat] || 0), 0);
+
+            // LOGIC HANDLERS
+            const resetGame = () => {
+                 let startInv = [];
+                 if(heirloomId) { const h = player.inventory.find(x=>x.id===heirloomId); if(h) startInv=[{...h, isEquipped:true}]; }
+                 let nextLuck = player.luck;
+                 if (gameState === GameState.ENDING) nextLuck += 1;
+                 
+                 setPlayer({...INITIAL_PLAYER, inventory: startInv, luck: nextLuck});
+                 setGameState(GameState.START);
+                 setLogs([]); setCurrentEnemy(null); setCurrentChoices([]); setPendingLoot(null); setHeirloomId(null); setStory("");
+            };
+
+            const startGame = () => {
+                setGameState(GameState.INTRO);
+                setStory(lang === 'zh' ? "主角走在长辛店国潮街误触机关，掉入了一个时空混乱的世界..." : "Walking down Changxindian, you fall into a void...");
+            };
+
+            const advanceToIntro2 = () => {
+                setStory(lang === 'zh' ? "只有收集到6个时空秘符才能离开这里..." : "Collect 6 Time Runes to escape...");
+                setGameState(GameState.EXPLORE);
+            };
+
+            const handleExplore = async () => {
+                setLoading(true);
+                const nextExp = player.explorationsInCurrentZone + 1;
+                
+                if (!player.bossLocated && nextExp >= 10) {
+                     setTimeout(() => {
+                         const boss = GameService.getZoneBoss(player.currentZone, lang, player.luck);
+                         setStory(lang === 'zh' ? `发现了区域 ${player.currentZone} 的领主——${boss.name}！` : `Discovered Zone ${player.currentZone} Lord — ${boss.name}!`);
+                         addLog(`${t.bossFound}: ${boss.name}`, 'danger');
+                         setPlayer(p => ({ ...p, explorationsInCurrentZone: nextExp, bossLocated: true }));
+                         setCurrentChoices([]);
+                         setGameState(GameState.EXPLORE);
+                         setLoading(false);
+                     }, 500);
+                     return;
+                }
+
+                try {
+                    const scen = GameService.generateScenario(player, lang);
+                    setStory(scen.description);
+                    if (scen.hasCombat) {
+                        setCurrentEnemy({
+                            name: scen.enemyName, description: scen.enemyDesc, hp: scen.enemyHp, maxHp: scen.enemyHp,
+                            atk: scen.enemyAtk, isBoss: false, dropRate: 0.3
+                        });
+                        setGameState(GameState.COMBAT);
+                        addLog(`${t.bossEncounter} ${scen.enemyName}!`, 'danger');
+                    } else {
+                        setCurrentChoices(scen.eventChoices);
+                        setGameState(GameState.EXPLORE);
+                    }
+                    setPlayer(p => ({ ...p, explorationsInCurrentZone: nextExp }));
+                } catch (e) { console.error(e); } finally { setLoading(false); }
+            };
+
+            const handleEventChoice = (c) => {
+                addLog(c.outcomeDescription, 'narrative');
+                let newLevel = player.level, newExp = player.exp + c.expChange, leveled = false;
+                if (newExp >= newLevel * 100) { newExp -= newLevel * 100; newLevel++; leveled = true; }
+                
+                let nextP = { ...player, exp: newExp, level: newLevel, maxHp: leveled ? player.maxHp + 20 : player.maxHp, atk: leveled ? (player.atk||10) + 5 : (player.atk||10), def: leveled ? (player.def||5) + 2 : (player.def||5) };
+                const extraHp = getExtraStat(nextP.inventory, 'HP');
+                const totalMax = nextP.maxHp + extraHp;
+                
+                if (leveled) { nextP.currentHp = totalMax; addLog(`${t.levelUp} ${newLevel}`, 'gain'); }
+                else if (c.hpChange !== 0) {
+                    nextP.currentHp = Math.min(totalMax, Math.max(0, player.currentHp + c.hpChange));
+                    addLog(c.hpChange > 0 ? `${t.recovered} ${c.hpChange}` : `${t.tookDamage} ${Math.abs(c.hpChange)}`, c.hpChange > 0 ? 'gain' : 'danger');
+                }
+                
+                if (c.statId && c.statId !== 'NONE') {
+                    if (c.statId === 'ATK') nextP.atk += c.statValue;
+                    if (c.statId === 'DEF') nextP.def += c.statValue;
+                    if (c.statId === 'DODGE') nextP.dodge += c.statValue;
+                    if (c.statId === 'CRIT_RATE') nextP.critRate += c.statValue;
+                    if (c.statId === 'CRIT_DMG') nextP.critDmg += c.statValue;
+                    if (c.statId === 'LUCK') nextP.luck += c.statValue;
+                    addLog(`${t.statUp} ${c.statId}`, 'gain');
+                }
+
+                if (c.getRelic) {
+                    const item = GameService.generateLoot(nextP.level, lang, nextP.luck);
+                    if (nextP.inventory.length >= 30) setPendingLoot(item);
+                    else {
+                        nextP.inventory = [...nextP.inventory, item];
+                        const color = item.rarity === 'Legendary' ? 'orange' : item.rarity === 'Epic' ? 'blue' : item.rarity === 'Rare' ? 'green' : 'gray';
+                        addLog(`${t.foundItem} <c:${color}>${item.name}</c>`, 'gain');
+                    }
+                }
+                setPlayer(nextP); setCurrentChoices([]); setStory("");
+            };
+
+            const handleCombatAction = async () => {
+                if (!currentEnemy || combatAnim !== 'idle') return;
+                setCombatAnim('playerAttack');
+                await new Promise(r => setTimeout(r, 150));
+                
+                const extraAtk = getExtraStat(player.inventory, 'ATK');
+                const totalAtk = (Number(player.atk) || 10) + extraAtk;
+                const critRate = Number(player.critRate) + getExtraStat(player.inventory, 'CRIT_RATE');
+                const critDmg = Number(player.critDmg) + getExtraStat(player.inventory, 'CRIT_DMG');
+
+                const isCrit = Math.random() < critRate;
+                const dmg = Math.floor(totalAtk * (isCrit ? critDmg : 1) * (0.9 + Math.random() * 0.2));
+                
+                setCombatAnim('enemyHit');
+                addLog(`${t.hitEnemy} ${currentEnemy.name} ${dmg} ${isCrit ? t.crit : ''}`, 'combat');
+                await new Promise(r => setTimeout(r, 400));
+                setCombatAnim('idle');
+
+                if (currentEnemy.hp - dmg <= 0) { handleVictory(currentEnemy); return; }
+
+                // Enemy Turn
+                await new Promise(r => setTimeout(r, 200));
+                if (Math.random() < (player.dodge + getExtraStat(player.inventory, 'DODGE'))) {
+                    addLog(`${t.dodged}!`, 'info');
+                    setCurrentEnemy(p => ({...p, hp: p.hp - dmg}));
+                } else {
+                    const eDmg = Math.max(1, Math.floor(currentEnemy.atk - ((player.def + getExtraStat(player.inventory, 'DEF')) * 0.5)));
+                    setCombatAnim('playerHit');
+                    await new Promise(r => setTimeout(r, 400));
+                    setCombatAnim('idle');
+                    addLog(`${currentEnemy.name} ${t.hitsYou} ${eDmg}`, 'danger');
+                    if (player.currentHp - eDmg <= 0) { setPlayer(p => ({...p, currentHp: 0})); setGameState(GameState.GAME_OVER); }
+                    else { setPlayer(p => ({...p, currentHp: p.currentHp - eDmg})); setCurrentEnemy(p => ({...p, hp: p.hp - dmg})); }
+                }
+            };
+
+            const handleVictory = async (enemy) => {
+                addLog(`${t.defeated} ${enemy.name}`, 'gain');
+                setCurrentEnemy(null);
+                
+                let newInv = [...player.inventory];
+                if (Math.random() < enemy.dropRate) {
+                     const item = GameService.generateLoot(player.level, lang, player.luck);
+                     if (newInv.length >= 30) setPendingLoot(item);
+                     else { 
+                         newInv.push(item);
+                         const color = item.rarity === 'Legendary' ? 'orange' : item.rarity === 'Epic' ? 'blue' : item.rarity === 'Rare' ? 'green' : 'gray';
+                         addLog(`${t.foundItem} <c:${color}>${item.name}</c>`, 'gain'); 
+                    }
+                }
+
+                if (enemy.isFinalBoss) {
+                    setPlayer(p => ({...p, inventory: newInv}));
+                    // AI Ending or Fallback
+                    setLoading(true);
+                    try {
+                        setEnding({ 
+                            title: "True Ending", 
+                            content: lang === 'zh' 
+                                ? "你修复了时间线的裂痕，非遗文物散发着微光，长辛店的街道恢复了往日的喧嚣。那些迷失的时空碎片，最终都找到了归宿。" 
+                                : "You mended the timeline's裂痕. Intangible heritage relics glowed softly, and Changxindian's streets regained their former bustle. Lost time fragments finally found their way home."
+                        });
+                    } catch(e) { setEnding({ title: "True Ending", content: "Cycle Broken." }); }
+                    setGameState(GameState.ENDING);
+                    setLoading(false);
+                    return;
+                }
+
+                setPlayer(p => ({ ...p, inventory: newInv, exp: p.exp + 50 })); 
+                if (enemy.isBoss) {
+                     const dial = GameService.generateBossDialogue(player.currentZone, lang);
+                     setStory(dial.dialogue);
+                     setCurrentChoices(dial.choices.map(c => ({ text: c.text, actionId: 'dialogue', isTruthful: c.isTruthful })));
+                     setGameState(GameState.DIALOGUE);
+                } else {
+                    setGameState(GameState.EXPLORE);
+                    setStory("");
+                }
+            };
+
+            const handleChallengeBoss = () => {
+                const boss = GameService.getZoneBoss(player.currentZone, lang, player.luck);
+                setCurrentEnemy({ ...boss, isBoss: true, dropRate: 1.0, maxHp: boss.hp });
+                setGameState(GameState.COMBAT);
+                addLog(t.challengeLog, 'danger');
+            };
+
+            const handleDialogue = async (c) => {
+                const score = c.isTruthful ? player.truthScore + 1 : player.truthScore;
+                addLog(`> ${c.text}`, 'narrative');
+                setCurrentChoices([]);
+                
+                if (player.currentZone >= 6) {
+                    if (score >= 4) {
+                        const fb = GameService.getFinalBoss(player, lang);
+                        setCurrentEnemy(fb);
+                        setGameState(GameState.COMBAT);
+                        addLog("FINAL BOSS APPEARS", 'danger');
+                        setStory(lang==='zh'?"时间熵现身了！":"Time Entropy appears!");
+                    } else {
+                        setGameState(GameState.ENDING);
+                        setEnding({ title: "Loop Reset", content: lang==='zh'?"时间重置...":"Time resets..." });
+                    }
+                } else {
+                    setPlayer(p => ({ ...p, currentZone: p.currentZone + 1, truthScore: score, explorationsInCurrentZone: 0, bossLocated: false }));
+                    setGameState(GameState.EXPLORE);
+                    addLog(`${t.zone} ${player.currentZone + 1}`, 'info');
+                }
+            };
+
+            const deleteItem = (id) => {
+                 const item = player.inventory.find(i=>i.id===id);
+                 if(!item) return;
+                 if(item.isEquipped && item.stats.HP > 0) setPlayer(p=>({...p, currentHp: Math.max(1, p.currentHp - item.stats.HP)}));
+                 
+                 let nextInv = player.inventory.filter(i=>i.id!==id);
+                 if(pendingLoot) { nextInv.push(pendingLoot); setPendingLoot(null); setShowBag(false); addLog(t.swapped, 'gain'); }
+                 else addLog(t.itemDeleted, 'info');
+                 
+                 setPlayer(p=>({...p, inventory: nextInv}));
+                 setSelectedId(null);
+            };
+
+            const toggleEquip = (item) => {
+                 if(item.isEquipped && item.stats.HP) setPlayer(p=>({...p, currentHp: Math.max(1, p.currentHp - item.stats.HP)}));
+                 if(!item.isEquipped && item.stats.HP) setPlayer(p=>({...p, currentHp: p.currentHp + item.stats.HP}));
+                 setPlayer(p=>({...p, inventory: p.inventory.map(i=>i.id===item.id?{...i, isEquipped:!i.isEquipped}:i)}));
+            };
+
+            const massEquip = () => {
+                const toEquip = player.inventory.filter(i => !i.isEquipped);
+                const hpGain = toEquip.reduce((a, b) => a + (b.stats.HP || 0), 0);
+                setPlayer(p => ({...p, currentHp: p.currentHp + hpGain, inventory: p.inventory.map(i => ({ ...i, isEquipped: true }))}));
+                addLog(lang==='zh'?"全部装备完毕":"All equipped", 'info');
+            };
+            
+            // --- RENDER HELPERS ---
+            // if (!apiKey) return (
+            //     <div className="h-screen bg-gray-900 flex flex-col items-center justify-center p-6 text-center space-y-4">
+            //         <h1 className="text-xl text-teal-400 font-bold">API Key Required</h1>
+            //         <p className="text-gray-400 text-sm">Please enter your Google Gemini API Key to play.</p>
+            //         <input type="password" onChange={(e)=>saveKey(e.target.value)} className="bg-gray-800 border border-gray-600 p-2 rounded text-white w-full max-w-xs" placeholder="AI Studio Key" />
+            //     </div>
+            // );
+
+            const totalAtk = (Number(player.atk)||10) + getExtraStat(player.inventory, 'ATK');
+            const totalDef = (Number(player.def)||5) + getExtraStat(player.inventory, 'DEF');
+            const totalCrit = Number(player.critRate) + getExtraStat(player.inventory, 'CRIT_RATE');
+            const totalCritDmg = Number(player.critDmg) + getExtraStat(player.inventory, 'CRIT_DMG');
+            const totalDodge = Number(player.dodge) + getExtraStat(player.inventory, 'DODGE');
+            const extraHp = getExtraStat(player.inventory, 'HP');
+            const totalMaxHp = player.maxHp + extraHp;
+
+            return (
+                <Layout lang={lang} setLang={setLang}>
+                    {gameState === GameState.START && (
+                        <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-8 animate-fade-in bg-gray-900 relative">
+                             <div className="relative z-10">
+                                <h1 className="text-5xl font-bold font-serif-sc text-transparent bg-clip-text bg-gradient-to-br from-teal-400 to-purple-600 filter contrast-125">{t.startTitle}</h1>
+                                <p className="text-gray-400 mt-4 text-sm font-mono">{t.startDesc}</p>
+                             </div>
+                             <button onClick={startGame} className="relative z-10 px-8 py-3 bg-teal-600 text-white font-bold rounded-full animate-float flex items-center gap-2 shadow-[0_0_20px_rgba(20,184,166,0.5)]"><Icons.Play className="h-5 w-5"/> {t.enterBtn}</button>
+                        </div>
+                    )}
+
+                    {gameState === GameState.INTRO && (
+                        <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6">
+                             <p className="text-lg text-gray-200 font-serif-sc">{story}</p>
+                             <button onClick={advanceToIntro2} className="px-6 py-2 border border-teal-500 text-teal-400 rounded hover:bg-teal-900/30">{t.continueBtn}</button>
+                        </div>
+                    )}
+
+                    {(gameState === GameState.EXPLORE || gameState === GameState.COMBAT || gameState === GameState.DIALOGUE) && (
+                        <div className="flex flex-col h-full relative">
+                            {/* STATUS BAR */}
+                            <div className="flex-none p-3 bg-gray-900/80 border-b border-gray-800 flex items-center gap-4">
+                                <div className="w-12 h-12 bg-indigo-600 rounded-lg overflow-hidden border border-gray-600"><img src={`https://robohash.org/${player.luck}?set=set5`} className="w-full h-full"/></div>
+                                <div className="flex-1 space-y-1">
+                                    <div className="h-4 bg-gray-800 rounded-full border border-gray-700 relative overflow-hidden">
+                                        <div className="absolute h-full bg-red-600" style={{width: `${(player.currentHp / totalMaxHp)*100}%`}}></div>
+                                        <div className="absolute inset-0 flex items-center justify-center text-[9px] font-bold drop-shadow">{player.currentHp} / {totalMaxHp}</div>
+                                    </div>
+                                    <div className="relative h-4 bg-gray-800 rounded-full border border-gray-700 relative overflow-hidden">
+                                        <div className="absolute h-full bg-yellow-600" style={{width: `${Math.min(100, (player.exp / (player.level * 100)) * 100)}%`}}></div>
+                                        <div className="absolute inset-0 flex items-center justify-center text-[9px] text-white font-bold shadow-sm">EXP {player.exp} / {player.level * 100}</div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-y-2 gap-x-1 text-[10px] text-gray-400 mt-1 bg-black/20 p-2 rounded">
+                                        <div className="flex justify-between px-2"><span className="text-gray-500">{t.atk}</span><span className="text-white font-mono">{totalAtk}</span></div>
+                                        <div className="flex justify-between px-2"><span className="text-gray-500">{t.def}</span><span className="text-white font-mono">{totalDef}</span></div>
+                                        <div className="flex justify-between px-2"><span className="text-gray-500">{t.luck}</span><span className="text-purple-300 font-mono">{player.luck}</span></div>
+                                        <div className="flex justify-between px-2"><span className="text-gray-500">{t.critStat}</span><span className="text-yellow-200 font-mono">{(totalCrit*100).toFixed(0)}%</span></div>
+                                        <div className="flex justify-between px-2"><span className="text-gray-500">{t.critDmg}</span><span className="text-red-200 font-mono">{(totalCritDmg * 100).toFixed(0)}%</span></div>
+                                        <div className="flex justify-between px-2"><span className="text-gray-500">{t.dodge}</span><span className="text-blue-200 font-mono">{(totalDodge*100).toFixed(0)}%</span></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* GAME WINDOW */}
+                            <div className={`flex-grow flex flex-col items-center justify-center p-4 relative space-y-4 overflow-y-auto ${combatAnim === 'playerHit' ? 'bg-red-900/20' : ''}`}>
+                                {gameState === GameState.COMBAT && currentEnemy && (
+                                    <div className={`relative animate-float ${combatAnim === 'enemyHit' ? 'animate-shake-x text-red-500' : ''}`}>
+                                        <img src={`https://robohash.org/${currentEnemy.name}?set=set2`} className="w-32 h-32 drop-shadow-lg"/>
+                                        <div className="h-2 bg-gray-800 rounded-full mt-2 overflow-hidden"><div className="h-full bg-red-600" style={{width: `${(currentEnemy.hp/currentEnemy.maxHp)*100}%`}}></div></div>
+                                    </div>
+                                )}
+                                <div className="text-center max-w-sm">
+                                     {loading ? <Icons.ArrowPath className="h-6 w-6 animate-spin mx-auto text-teal-500"/> : 
+                                     <p className="text-sm bg-gray-900/60 p-4 rounded border border-gray-700/50 backdrop-blur-sm text-gray-200 shadow-lg">{story}</p>}
+                                </div>
+                                {!loading && currentChoices.length > 0 && (
+                                    <div className="w-full max-w-xs space-y-2 z-20">
+                                        {currentChoices.map((c,i) => (
+                                            <button key={i} onClick={()=> c.actionId === 'dialogue' ? handleDialogue(c) : handleEventChoice(c)} className="w-full py-3 px-4 bg-gray-800/90 border border-gray-600 hover:border-teal-400 rounded text-left flex justify-between group transition-all">
+                                                <span className="group-hover:text-teal-300">{c.text}</span> <Icons.CheckCircle className="h-4 w-4 opacity-0 group-hover:opacity-100 text-teal-400"/>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                                {!loading && gameState === GameState.COMBAT && (
+                                    <div className="flex gap-4 w-full max-w-xs z-20">
+                                        <button onClick={handleCombatAction} disabled={combatAnim!=='idle'} className={`flex-1 py-3 bg-red-900/80 border border-red-600 text-red-100 font-bold rounded flex justify-center gap-2 ${combatAnim==='playerAttack'?'animate-lunge':''}`}><Icons.Fire className="h-5 w-5"/> {t.attack}</button>
+                                        {!currentEnemy?.isFinalBoss && <button onClick={handleExplore} disabled={combatAnim!=='idle'} className="flex-1 py-3 bg-gray-700 border border-gray-500 text-gray-200 rounded">{t.flee}</button>}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* LOGS */}
+                            <div className="h-[35%] bg-black/40 border-t border-gray-800 p-2 overflow-y-auto text-xs font-mono text-gray-400 space-y-1 relative scrollbar-hide">
+                                <div className="absolute top-0 right-0 text-[10px] text-gray-600 p-1">LOGS</div>
+                                {logs.map(l => (
+                                    <div key={l.id} className={`border-l-2 pl-2 ${l.type==='danger'?'border-red-500 text-red-300':l.type==='gain'?'border-yellow-500 text-yellow-100':l.type==='narrative'?'border-teal-500 text-teal-200 italic':'border-gray-600'}`}>{renderLogText(l.text)}</div>
+                                ))}
+                                <div ref={logsRef}></div>
+                            </div>
+
+                            {/* CONTROLS */}
+                            <div className="absolute bottom-6 left-0 right-0 flex justify-center items-end px-6 pointer-events-none z-40">
+                                <div className="pointer-events-auto mr-auto">
+                                    {player.bossLocated && gameState === GameState.EXPLORE && !currentEnemy && <button onClick={handleChallengeBoss} className="w-12 h-12 rounded-full bg-red-900 border-2 border-red-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform"><Icons.ExclamationTriangle className="h-6 w-6 text-white"/></button>}
+                                </div>
+                                <div className="pointer-events-auto -mb-2">
+                                     {gameState === GameState.EXPLORE && !currentEnemy && currentChoices.length === 0 && <button onClick={handleExplore} disabled={loading} className="w-20 h-20 rounded-full bg-teal-600 border-4 border-teal-400/50 shadow-[0_0_30px_rgba(20,184,166,0.5)] flex items-center justify-center hover:bg-teal-500 animate-float disabled:opacity-50 disabled:animate-none"><Icons.MagnifyingGlass className="h-10 w-10 text-white"/></button>}
+                                </div>
+                                <div className="pointer-events-auto ml-auto">
+                                    <button onClick={()=>setShowBag(true)} className="w-12 h-12 rounded-full bg-gray-800 border border-gray-500 flex items-center justify-center relative"><Icons.ArchiveBox className="h-6 w-6 text-gray-300"/><span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">{player.inventory.length}</span></button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* BAG MODAL */}
+                    {showBag && (
+                        <div className="absolute inset-0 z-50 bg-black/90 p-4 flex flex-col backdrop-blur">
+                             <div className="flex justify-between mb-4 border-b border-gray-700 pb-2">
+                                 <h2 className="text-xl text-teal-400 flex gap-2"><Icons.ArchiveBox className="h-5 w-5"/> {t.bag}</h2>
+                                 <button onClick={()=>setShowBag(false)}><Icons.XMark className="h-6 w-6 text-gray-400"/></button>
+                             </div>
+                             <div className="mb-2 bg-gray-800/50 p-2 rounded text-xs grid grid-cols-4 gap-2 border border-gray-700 text-center">
+                                 <span className="text-gray-400 col-span-4 text-left">{t.bonusStats}</span>
+                                 <span className="text-red-300">ATK +{getExtraStat(player.inventory,'ATK')}</span>
+                                 <span className="text-blue-300">DEF +{getExtraStat(player.inventory,'DEF')}</span>
+                                 <span className="text-green-300">HP +{getExtraStat(player.inventory,'HP')}</span>
+                                 <span className="text-yellow-300">LUCK +0</span>
+                             </div>
+                             <div className="grid grid-cols-10 gap-2 mb-4">
+                                 {Array.from({length:30}).map((_,i) => {
+                                     const item = player.inventory[i];
+                                     if(!item) return <div key={i} className="aspect-square bg-gray-800/50 rounded border border-gray-800"></div>;
+                                     const color = item.rarity === 'Legendary' ? 'border-orange-500' : item.rarity === 'Epic' ? 'border-blue-500' : item.rarity === 'Rare' ? 'border-green-500' : 'border-gray-600';
+                                     return <button key={item.id} onClick={()=>setSelectedId(item.id)} className={`aspect-square rounded border-2 ${color} ${selectedId===item.id?'ring-2 ring-white':''} relative bg-gray-800 text-[10px] ${item.isEquipped?'bg-teal-900/40':''}`}>{item.name[0]}{item.isEquipped && <div className="absolute top-0 right-0 w-2 h-2 bg-teal-500 rounded-full"></div>}</button>
+                                 })}
+                             </div>
+                             <div className="flex-1 bg-gray-800/50 border border-gray-700 rounded p-3 relative">
+                                  {selectedId ? (() => {
+                                      const item = player.inventory.find(i=>i.id===selectedId);
+                                      if(!item) return null;
+                                      const colorClass = item.rarity === 'Legendary' ? 'text-orange-500' : item.rarity === 'Epic' ? 'text-blue-400' : item.rarity === 'Rare' ? 'text-green-400' : 'text-gray-400';
+                                      return (
+                                          <div className="h-full flex flex-col">
+                                              <button onClick={()=>setSelectedId(null)} className="absolute -top-3 -right-3 p-1 bg-red-900 rounded-full border border-red-500 hover:bg-red-700 z-10"><Icons.XMark className="h-4 w-4 text-white"/></button>
+                                              <div className={`font-bold text-lg mb-1 ${colorClass}`}>{item.name}</div>
+                                              <div className="text-xs text-gray-500 italic mb-2">{item.rarity}</div>
+                                              <div className="grid grid-cols-2 text-xs text-gray-300 gap-2 mb-4">
+                                                  {Object.entries(item.stats).map(([k,v])=><div key={k} className="flex justify-between border-b border-gray-700 pb-1"><span>{t[k]||k}</span><span className="text-white">+{['CRIT_RATE','CRIT_DMG','DODGE'].includes(k)?(v*100).toFixed(1)+'%':v}</span></div>)}
+                                              </div>
+                                              <p className="text-xs text-gray-400 italic border-l-2 border-gray-600 pl-2">{item.description}</p>
+                                              <div className="mt-auto grid grid-cols-2 gap-3">
+                                                  {pendingLoot ? (
+                                                    <>
+                                                      <button onClick={()=>deleteItem(item.id)} className="col-span-2 py-2 bg-yellow-600 rounded font-bold text-xs flex items-center justify-center gap-2"><Icons.ArrowPath className="h-4 w-4"/> {t.confirmSwap}</button>
+                                                      <button onClick={()=>{setPendingLoot(null);setShowBag(false)}} className="col-span-2 py-2 bg-gray-700 rounded text-gray-300 text-xs">{t.cancelSwap}</button>
+                                                    </>
+                                                  ) : (
+                                                  <>
+                                                      <button onClick={()=>toggleEquip(item)} className={`py-2 rounded font-bold text-xs ${item.isEquipped?'bg-gray-700 text-gray-300':'bg-teal-700 text-white'}`}>{item.isEquipped?t.unequip:t.equip}</button>
+                                                      <button onClick={()=>deleteItem(item.id)} className="py-2 bg-red-900/50 border border-red-800 rounded text-red-200 text-xs flex items-center justify-center gap-1"><Icons.Trash className="h-3 w-3"/> {t.delete}</button>
+                                                  </>)}
+                                              </div>
+                                          </div>
+                                      )
+                                  })() : <div className="text-center text-gray-500 mt-10 text-xs flex flex-col items-center"><Icons.ArchiveBox className="h-10 w-10 mb-2 opacity-50"/>{t.selectItem}</div>}
+                             </div>
+                             {!selectedId && !pendingLoot && <button onClick={massEquip} className="mt-2 w-full py-3 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded flex items-center justify-center gap-2 text-sm"><Icons.Sparkles className="h-4 w-4 text-yellow-300"/> {t.autoEquip}</button>}
+                        </div>
+                    )}
+                    
+                    {/* LOOT CONFLICT */}
+                    {pendingLoot && !showBag && (
+                        <div className="absolute inset-0 z-[60] bg-black/80 flex items-center justify-center p-6 backdrop-blur-sm">
+                            <div className="bg-gray-900 border border-gray-600 rounded p-6 w-full max-w-sm shadow-2xl">
+                                <h3 className="text-lg text-yellow-500 font-bold mb-2 flex gap-2"><Icons.ExclamationTriangle className="h-6 w-6"/> {t.lootConflict}</h3>
+                                <p className="text-sm text-gray-300 mb-4">{t.bagFullDesc}</p>
+                                <div className="bg-black/40 p-3 rounded mb-4 border border-gray-700">
+                                    <div className={`font-bold ${pendingLoot.rarity === 'Legendary' ? 'text-orange-500' : pendingLoot.rarity === 'Epic' ? 'text-blue-400' : pendingLoot.rarity === 'Rare' ? 'text-green-400' : 'text-gray-400'}`}>{pendingLoot.name}</div>
+                                    <div className="text-xs text-gray-500">{pendingLoot.rarity}</div>
+                                </div>
+                                <button onClick={()=>setShowBag(true)} className="w-full py-3 bg-teal-600 rounded font-bold mb-2 hover:bg-teal-500">{t.swapItem}</button>
+                                <button onClick={()=>setPendingLoot(null)} className="w-full py-3 bg-gray-700 rounded text-gray-300 hover:bg-gray-600">{t.discardNew}</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* GAME OVER / ENDING */}
+                    {(gameState === GameState.GAME_OVER || gameState === GameState.ENDING) && (
+                        <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-6 bg-black/80 z-50 backdrop-blur">
+                             <div className={`p-4 rounded-full border-4 ${gameState===GameState.ENDING?'border-yellow-500 bg-yellow-900/20':'border-red-600 bg-red-900/20'} mb-2`}>
+                                {gameState===GameState.ENDING?<Icons.Star className="h-12 w-12 text-yellow-500"/>:<Icons.XMark className="h-12 w-12 text-red-600"/>}
+                             </div>
+                             <h2 className={`text-3xl font-serif-sc ${gameState===GameState.ENDING?'text-yellow-400':'text-red-500'}`}>{gameState===GameState.ENDING?ending?.title:t.gameOver}</h2>
+                             <p className="text-gray-300 max-w-xs">{gameState===GameState.ENDING?ending?.content:t.gameOverDesc}</p>
+                             
+                             <div className="w-full max-w-sm bg-gray-900/50 p-4 rounded border border-gray-700">
+                                 <h3 className="text-teal-400 text-sm font-bold mb-2">{t.selectHeirloom}</h3>
+                                 <p className="text-xs text-gray-500 mb-2">{t.heirloomDesc}</p>
+                                 <div className="grid grid-cols-5 gap-2 max-h-32 overflow-y-auto mb-4 p-1">
+                                     {player.inventory.map(i => {
+                                         const color = i.rarity === 'Legendary' ? 'border-orange-500' : i.rarity === 'Epic' ? 'border-blue-500' : i.rarity === 'Rare' ? 'border-green-500' : 'border-gray-600';
+                                         return <button key={i.id} onClick={()=>setHeirloomId(i.id)} className={`w-10 h-10 border-2 rounded ${heirloomId===i.id?'ring-2 ring-white bg-gray-700':'bg-gray-800'} ${color} text-[10px]`}>{i.name.substring(0,1)}</button>
+                                     })}
+                                 </div>
+                                 <button onClick={resetGame} className="w-full py-3 bg-teal-600 hover:bg-teal-500 rounded font-bold text-white shadow-lg">{t.restartWithHeirloom}</button>
+                             </div>
+                        </div>
+                    )}
+                </Layout>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
